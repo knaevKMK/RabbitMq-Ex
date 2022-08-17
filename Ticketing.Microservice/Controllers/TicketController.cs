@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Ticketing.Microservice.Controllers
 {
-    [Route("[controller]")]
+   
     [ApiController]
     public class TicketController : ControllerBase
     {
