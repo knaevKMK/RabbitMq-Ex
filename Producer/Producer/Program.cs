@@ -19,6 +19,7 @@ builder.Services.AddMassTransit(x =>
             h.Username("guest");
             h.Password("guest");
         });
+        config.ConfigureEndpoints(provider);
     }));
 
 });

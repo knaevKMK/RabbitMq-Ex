@@ -22,7 +22,9 @@ namespace Producer.Controllers
         public async Task<ActionResult> Get()
         {
             var ticket = new Ticket();
+            _logger.LogInformation($"New Ticket created with msg {ticket.Message}");
             Uri uri = new Uri("rabbitmq://localhost/ticketQueue");
+       //     var response = await _bus.Request<Ticket, Ticket>(uri,ticket);
             var endPoint = await _bus.GetSendEndpoint(uri);
             await endPoint.Send(ticket);
             return Ok(ticket);
