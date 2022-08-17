@@ -1,33 +1,31 @@
+using MassTransit;
 using Microsoft.AspNetCore.Mvc;
+using Producer.Models;
 
 namespace Producer.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("")]
     public class WeatherForecastController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    };
+
 
         private readonly ILogger<WeatherForecastController> _logger;
-
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        private readonly IBus _bus;
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IBus bus)
         {
             _logger = logger;
+            _bus = bus;
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        [HttpGet]
+        public async Task<ActionResult> Get()
         {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+            var ticket = new Ticket();
+            Uri uri = new Uri("rabbitmq://localhost/ticketQueue");
+            var endPoint = await _bus.GetSendEndpoint(uri);
+            await endPoint.Send(ticket);
+            return Ok(ticket);
         }
     }
 }
